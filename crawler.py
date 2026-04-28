@@ -50,5 +50,4 @@ def get_all_scripts():
             "w",
             encoding="utf-8",
         ) as outfile:
-            trimmed = "\n".join(line.strip() for line in script.splitlines())
-            outfile.write(trimmed)
+            outfile.write(script)
