@@ -17,3 +17,4 @@ run: $(VENV)/.installed
 
 clean:
 	find downloaded-scripts -type f -delete
+	rm -rf output

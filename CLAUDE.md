@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this project does
 
-Downloads all screenplay scripts from imsdb.com and converts them to [Fountain](https://fountain.io) format. Crawling and parsing are separate phases.
+Downloads all screenplay scripts from imsdb.com, converts them to [Fountain](https://fountain.io) format, then exports to PDF using screenplain. Crawling, parsing, and conversion are separate phases.
 
 ## Running
 
@@ -20,10 +20,11 @@ make clean   # delete all files in downloaded-scripts/
 Python source lives in `src/`. Three modules with distinct responsibilities:
 
 - **`src/crawler.py`** — fetches imsdb.com, scrapes all script links from `/all-scripts.html`, downloads each HTML script page, and writes raw text to `downloaded-scripts/<title>.fountain`.
-- **`src/parser.py`** — exposes `parse_file(path)` (single file) and `parse()` (all `.fountain` files in `downloaded-scripts/`); sends each file to the Claude API (`claude-haiku-4-5`) with a detailed Fountain formatting system prompt, and overwrites the file with the cleaned output.
-- **`src/main.py`** — entry point; currently calls `get_all_scripts()` to crawl (`parse()` is imported but commented out).
+- **`src/parser_api.py`** / **`src/parser_claude_code.py`** — send each `.fountain` file to the Claude API (`claude-haiku-4-5`) with a detailed Fountain formatting system prompt and overwrite the file with cleaned output.
+- **`src/converter.py`** — reads each cleaned `.fountain` file using screenplain's parser, then writes `output/<title>.pdf`.
+- **`src/main.py`** — entry point; runs crawl → parse → convert in sequence.
 
-The `downloaded-scripts/` directory is gitignored except for `.gitkeep`.
+The `downloaded-scripts/` directory is gitignored except for `.gitkeep`. The `output/` directory is created on demand.
 
 ## Key dependency
 
