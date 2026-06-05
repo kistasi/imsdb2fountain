@@ -7,7 +7,7 @@ from bs4 import BeautifulSoup
 
 BASE_URL = "http://www.imsdb.com"
 SCRIPTS_DIR = "downloaded-scripts"
-DOWNLOAD_LIMIT = 5  # HACK: remove to download all scripts
+DOWNLOAD_LIMIT = 1  # HACK: remove to download all scripts
 REQUEST_DELAY = 1.0  # seconds between requests
 
 

@@ -1,3 +1,6 @@
+-include .env
+export
+
 .DEFAULT_GOAL := all
 
 IMAGE = imsdb
@@ -7,7 +10,7 @@ build:
 	docker build -t $(IMAGE) .
 
 run:
-	docker run -it --rm --name $(IMAGE) $(VOLUME) $(IMAGE)
+	docker run -it --rm --name $(IMAGE) $(VOLUME) -e ANTHROPIC_API_KEY $(IMAGE)
 
 all: clean build run
 
