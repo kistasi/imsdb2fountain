@@ -11,23 +11,26 @@ Downloads all screenplay scripts from imsdb.com and converts them to [Fountain](
 The standard way to run is via Docker (mounts `downloaded-scripts/` as a volume so output persists):
 
 ```bash
-source run.sh
+make build   # build the image
+make run     # run the container
+make all     # build + run in one step
+make shell   # open a shell inside the container for debugging
 ```
 
 To run directly without Docker (requires Python 3 + dependencies installed):
 
 ```bash
 pip install -r requirements.txt
-python main.py
+python src/main.py
 ```
 
 ## Architecture
 
-Three modules with distinct responsibilities:
+Python source lives in `src/`. Three modules with distinct responsibilities:
 
-- **`crawler.py`** — fetches imsdb.com, scrapes all script links from `/all-scripts.html`, downloads each HTML script page, and writes raw text to `downloaded-scripts/<title>.fountain`.
-- **`parser.py`** — reads a `.fountain` file, parses it with `screenplay-tools`, normalises ACTION elements (collapses whitespace), and rewrites the file using the Fountain writer.
-- **`main.py`** — entry point; currently only calls `parse()` (crawler is imported but `get_all_scripts()` is not called from main).
+- **`src/crawler.py`** — fetches imsdb.com, scrapes all script links from `/all-scripts.html`, downloads each HTML script page, and writes raw text to `downloaded-scripts/<title>.fountain`.
+- **`src/parser.py`** — reads a `.fountain` file, parses it with `screenplay-tools`, normalises ACTION elements (collapses whitespace), and rewrites the file using the Fountain writer.
+- **`src/main.py`** — entry point; currently only calls `parse()` (crawler is imported but `get_all_scripts()` is not called from main).
 
 The `downloaded-scripts/` directory is gitignored except for `.gitkeep`; `2012.fountain` in the repo root is a test fixture used during parser development.
 

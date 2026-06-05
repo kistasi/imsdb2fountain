@@ -1,0 +1,6 @@
+.git
+.claude
+downloaded-scripts
+*.fountain
+__pycache__
+*.pyc

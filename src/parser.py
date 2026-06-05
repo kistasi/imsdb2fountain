@@ -4,9 +4,11 @@ from screenplay_tools.fountain.parser import ElementType, Parser
 from screenplay_tools.fountain.writer import Writer
 
 
-def parse():
-    file = os.path.join("downloaded-scripts", "2012.fountain")
-    with open(file, encoding="utf-8") as f:
+SCRIPTS_DIR = "downloaded-scripts"
+
+
+def parse_file(path):
+    with open(path, encoding="utf-8") as f:
         content = f.read()
 
     fp = Parser()
@@ -19,5 +21,12 @@ def parse():
     writer = Writer()
     output = writer.write(fp.script)
 
-    with open(file, "w", encoding="utf-8") as f:
+    with open(path, "w", encoding="utf-8") as f:
         f.write(output)
+
+
+def parse():
+    for filename in os.listdir(SCRIPTS_DIR):
+        if filename.endswith(".fountain"):
+            print(f"parsing {filename}")
+            parse_file(os.path.join(SCRIPTS_DIR, filename))
