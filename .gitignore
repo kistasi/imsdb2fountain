@@ -8,3 +8,4 @@ downloaded-scripts/*
 output/*
 scripts.db
 pipeline.log
+pipeline.pid
