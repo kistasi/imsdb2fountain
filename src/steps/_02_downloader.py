@@ -7,7 +7,6 @@ from bs4 import BeautifulSoup
 from helpers import db, imsdb
 
 SCRIPTS_DIR = "downloaded-scripts"
-DOWNLOAD_LIMIT = 1  # HACK: remove to download all scripts
 
 
 def _fetch_script_text(relative_link):
@@ -48,11 +47,7 @@ def step_02_download_all():
         print("nothing to download")
         return
 
-    downloaded = 0
     for row in pending:
-        if downloaded >= DOWNLOAD_LIMIT:
-            break
-
         title = row["title"]
         link = row["imsdb_link"]
         print(f"downloading {title!r}")
@@ -73,4 +68,3 @@ def step_02_download_all():
             f.write(script)
 
         db.set_status_by_link(link, "downloaded")
-        downloaded += 1
