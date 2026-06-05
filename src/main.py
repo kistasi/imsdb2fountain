@@ -8,7 +8,7 @@ from steps._04_converter import step_04_convert
 if __name__ == "__main__":
     db.init()
     step_01_shortlist_all()
-    # step_02_download_all()
-    # step_03a_parse_api()
-    # step_04_convert()
+    step_02_download_all()
+    step_03a_parse_api()
+    step_04_convert()
     print(db.summary())
