@@ -8,7 +8,7 @@ from screenplain.parsers import fountain
 from screenplain.richstring import parse_emphasis
 from screenplain.types import Slug
 
-import db
+from helpers import db
 
 SCRIPTS_DIR = "downloaded-scripts"
 OUTPUT_DIR = "output"

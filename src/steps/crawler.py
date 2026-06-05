@@ -5,7 +5,7 @@ from urllib.parse import quote
 import requests
 from bs4 import BeautifulSoup
 
-import db
+from helpers import db
 
 BASE_URL = "http://www.imsdb.com"
 SCRIPTS_DIR = "downloaded-scripts"
