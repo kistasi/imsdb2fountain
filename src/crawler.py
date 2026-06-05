@@ -5,6 +5,8 @@ from urllib.parse import quote
 import requests
 from bs4 import BeautifulSoup
 
+import db
+
 BASE_URL = "http://www.imsdb.com"
 SCRIPTS_DIR = "downloaded-scripts"
 DOWNLOAD_LIMIT = 1  # HACK: remove to download all scripts
@@ -17,55 +19,84 @@ def _get(url):
     return response.text
 
 
-def get_script(relative_link):
+def shortlist_all():
+    """Scrape /all-scripts.html and record every screenplay in the DB."""
+    soup = BeautifulSoup(_get(BASE_URL + "/all-scripts.html"), "html.parser")
+    time.sleep(REQUEST_DELAY)
+
+    count = 0
+    for p in soup.find_all("p"):
+        if not p.a:
+            continue
+        title = p.a.get_text(strip=True)
+        link = p.a["href"]
+        db.upsert_shortlisted(title, link)
+        count += 1
+
+    print(f"shortlisted {count} screenplays")
+
+
+def _fetch_script_text(relative_link):
+    """Return script text, or None if unavailable (no script, PDF-only, etc.)."""
     tail = relative_link.split("/")[-1]
-    print(f"fetching {tail}")
+    print(f"  fetching {tail}")
 
     front_soup = BeautifulSoup(_get(BASE_URL + quote(relative_link)), "html.parser")
     time.sleep(REQUEST_DELAY)
 
     centers = front_soup.find_all("p", align="center")
     if not centers or not centers[0].a:
-        print(f"{tail} has no script :(")
-        return None, None
+        print(f"  {tail}: no script link")
+        return None
 
     script_link = centers[0].a["href"]
     if not script_link.endswith(".html"):
-        print(f"{tail} is a pdf :(")
-        return None, None
+        print(f"  {tail}: PDF only, skipping")
+        return None
 
-    title = (
-        script_link.split("/")[-1].removesuffix(" Script.html").removesuffix(".html")
-    )
     script_soup = BeautifulSoup(_get(BASE_URL + script_link), "html.parser")
     time.sleep(REQUEST_DELAY)
 
     cells = script_soup.find_all("td", {"class": "scrtext"})
     if not cells:
-        print(f"{tail} has no script text :(")
-        return None, None
+        print(f"  {tail}: no script text")
+        return None
 
-    return title, cells[0].get_text()
+    return cells[0].get_text()
 
 
-def get_all_scripts():
+def download_all():
+    """Download raw script text for every shortlisted (or previously failed) screenplay."""
     os.makedirs(SCRIPTS_DIR, exist_ok=True)
 
-    soup = BeautifulSoup(_get(BASE_URL + "/all-scripts.html"), "html.parser")
-    time.sleep(REQUEST_DELAY)
+    pending = db.get_by_status("shortlisted") + db.get_by_status("failed")
+    if not pending:
+        print("nothing to download")
+        return
 
     downloaded = 0
-    for p in soup.find_all("p"):
-        if not p.a:
-            continue
-        title, script = get_script(p.a["href"])
-        if not script:
+    for row in pending:
+        if downloaded >= DOWNLOAD_LIMIT:
+            break
+
+        title = row["title"]
+        link = row["imsdb_link"]
+        print(f"downloading {title!r}")
+
+        try:
+            script = _fetch_script_text(link)
+        except Exception as e:
+            print(f"  error: {e}")
+            db.set_status_by_link(link, "failed", str(e))
             continue
 
-        path = os.path.join(SCRIPTS_DIR, title.strip() + ".fountain")
+        if not script:
+            db.set_status_by_link(link, "failed", "no script available")
+            continue
+
+        path = os.path.join(SCRIPTS_DIR, title + ".fountain")
         with open(path, "w", encoding="utf-8") as f:
             f.write(script)
 
+        db.set_status_by_link(link, "downloaded")
         downloaded += 1
-        if downloaded >= DOWNLOAD_LIMIT:
-            break

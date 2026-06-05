@@ -3,6 +3,8 @@ from pathlib import Path
 
 import anthropic
 
+import db
+
 SCRIPTS_DIR = "downloaded-scripts"
 
 SYSTEM_PROMPT = (Path(__file__).parent / "system_prompt.md").read_text(encoding="utf-8")
@@ -39,7 +41,20 @@ def parse_file(path):
 
 
 def parse_api():
+    pending = {row["title"] for row in db.get_by_status("downloaded")}
+    pending |= {row["title"] for row in db.get_by_status("failed")}
+
     for filename in os.listdir(SCRIPTS_DIR):
-        if filename.endswith(".fountain"):
-            print(f"parsing {filename}")
+        if not filename.endswith(".fountain"):
+            continue
+        title = filename.removesuffix(".fountain")
+        if title not in pending:
+            continue
+
+        print(f"parsing {filename}")
+        try:
             parse_file(os.path.join(SCRIPTS_DIR, filename))
+            db.set_status(title, "parsed")
+        except Exception as e:
+            print(f"  error: {e}")
+            db.set_status(title, "failed", str(e))

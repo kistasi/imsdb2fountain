@@ -8,6 +8,8 @@ from screenplain.parsers import fountain
 from screenplain.richstring import parse_emphasis
 from screenplain.types import Slug
 
+import db
+
 SCRIPTS_DIR = "downloaded-scripts"
 OUTPUT_DIR = "output"
 
@@ -33,10 +35,20 @@ def convert():
     out_dir = Path(OUTPUT_DIR)
     out_dir.mkdir(exist_ok=True)
 
+    pending = {row["title"] for row in db.get_by_status("parsed")}
+    pending |= {row["title"] for row in db.get_by_status("failed")}
+
     for filename in os.listdir(SCRIPTS_DIR):
-        if filename.endswith(".fountain"):
-            print(f"converting {filename}")
-            try:
-                convert_file(os.path.join(SCRIPTS_DIR, filename), out_dir)
-            except Exception as e:
-                print(f"  error: {e}")
+        if not filename.endswith(".fountain"):
+            continue
+        title = filename.removesuffix(".fountain")
+        if title not in pending:
+            continue
+
+        print(f"converting {filename}")
+        try:
+            convert_file(os.path.join(SCRIPTS_DIR, filename), out_dir)
+            db.set_status(title, "converted")
+        except Exception as e:
+            print(f"  error: {e}")
+            db.set_status(title, "failed", str(e))
