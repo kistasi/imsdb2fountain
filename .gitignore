@@ -5,3 +5,4 @@ __pycache__
 .venv
 
 downloaded-scripts/*
+output/*
