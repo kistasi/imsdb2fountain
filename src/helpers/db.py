@@ -2,7 +2,7 @@ import sqlite3
 from contextlib import contextmanager
 from pathlib import Path
 
-DB_PATH = Path(__file__).parent.parent / "scripts.db"
+DB_PATH = Path(__file__).parent.parent.parent / "scripts.db"
 
 STATUSES = ("shortlisted", "downloaded", "parsed", "converted", "failed")
 _STATUS_RANK = {s: i for i, s in enumerate(STATUSES)}
