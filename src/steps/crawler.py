@@ -19,23 +19,6 @@ def _get(url):
     return response.text
 
 
-def shortlist_all():
-    """Scrape /all-scripts.html and record every screenplay in the DB."""
-    soup = BeautifulSoup(_get(BASE_URL + "/all-scripts.html"), "html.parser")
-    time.sleep(REQUEST_DELAY)
-
-    count = 0
-    for p in soup.find_all("p"):
-        if not p.a:
-            continue
-        title = p.a.get_text(strip=True)
-        link = p.a["href"]
-        db.upsert_shortlisted(title, link)
-        count += 1
-
-    print(f"shortlisted {count} screenplays")
-
-
 def _fetch_script_text(relative_link):
     """Return script text, or None if unavailable (no script, PDF-only, etc.)."""
     tail = relative_link.split("/")[-1]
