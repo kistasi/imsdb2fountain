@@ -6,7 +6,7 @@ Based on the original project by [j2kun](https://github.com/j2kun/imsdb_download
 
 ## Prerequisites
 
-- [Docker](https://www.docker.com)
+- Python 3
 - An [Anthropic API key](https://console.anthropic.com)
 
 ## Usage
@@ -15,7 +15,7 @@ Based on the original project by [j2kun](https://github.com/j2kun/imsdb_download
 cp .env.example .env
 # add your ANTHROPIC_API_KEY to .env
 
-make all   # build image and run
+make run
 ```
 
-Scripts are saved to `downloaded-scripts/` (mounted as a Docker volume so they persist between runs).
+Scripts are saved to `downloaded-scripts/`.

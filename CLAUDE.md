@@ -10,21 +10,9 @@ Downloads all screenplay scripts from imsdb.com and converts them to [Fountain](
 
 Copy `.env.example` to `.env` and add your `ANTHROPIC_API_KEY` before running.
 
-The standard way to run is via Docker (mounts `downloaded-scripts/` as a volume so output persists):
-
 ```bash
-make build   # build the image
-make run     # run the container (reads ANTHROPIC_API_KEY from .env)
-make all     # build + run in one step
-make shell   # open a shell inside the container for debugging
+make run     # creates .venv, installs deps, runs src/main.py; reads ANTHROPIC_API_KEY from .env
 make clean   # delete all files in downloaded-scripts/
-```
-
-To run directly without Docker (requires Python 3 + dependencies installed):
-
-```bash
-pip install -r requirements.txt
-ANTHROPIC_API_KEY=your_key python src/main.py
 ```
 
 ## Architecture

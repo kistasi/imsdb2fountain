@@ -1,21 +1,19 @@
 -include .env
 export
 
-.DEFAULT_GOAL := all
+.DEFAULT_GOAL := run
 
-IMAGE = imsdb
-VOLUME = -v "$(PWD)/downloaded-scripts:/usr/src/app/downloaded-scripts"
+VENV := .venv
+PYTHON := $(VENV)/bin/python
+PIP := $(VENV)/bin/pip
 
-build:
-	docker build -t $(IMAGE) .
+$(VENV)/.installed: requirements.txt
+	python3 -m venv $(VENV)
+	$(PIP) install --quiet -r requirements.txt
+	touch $@
 
-run:
-	docker run -it --rm --name $(IMAGE) $(VOLUME) -e ANTHROPIC_API_KEY $(IMAGE)
-
-all: clean build run
-
-shell:
-	docker run -it --rm --name $(IMAGE)-shell $(VOLUME) $(IMAGE) /bin/bash
+run: $(VENV)/.installed
+	$(PYTHON) src/main.py
 
 clean:
 	find downloaded-scripts -type f -delete
