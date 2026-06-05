@@ -5,6 +5,8 @@ from pathlib import Path
 from screenplain.export import pdf
 from screenplain.export.pdf import Settings
 from screenplain.parsers import fountain
+from screenplain.richstring import parse_emphasis
+from screenplain.types import Slug
 
 SCRIPTS_DIR = "downloaded-scripts"
 OUTPUT_DIR = "output"
@@ -14,6 +16,12 @@ def convert_file(src_path, out_dir):
     stem = Path(src_path).stem
     with codecs.open(src_path, "r", encoding="utf-8") as f:
         screenplay = fountain.parse(f)
+
+    scene_num = 1
+    for para in screenplay.paragraphs:
+        if isinstance(para, Slug) and para.scene_number is None:
+            para.scene_number = parse_emphasis(str(scene_num))
+            scene_num += 1
 
     pdf_path = out_dir / f"{stem}.pdf"
     settings = Settings(strong_slugs=True)
