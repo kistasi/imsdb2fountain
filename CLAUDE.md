@@ -19,13 +19,15 @@ make clean   # delete all files in downloaded-scripts/
 
 Python source lives in `src/`, split into two sub-packages:
 
-**`src/steps/`** — pipeline stages:
-- **`crawler.py`** — fetches imsdb.com, scrapes all script links from `/all-scripts.html`, downloads each HTML script page, and writes raw text to `downloaded-scripts/<title>.fountain`.
-- **`parser_api.py`** / **`parser_claude_code.py`** — send each `.fountain` file to the Claude API (`claude-haiku-4-5`) with a detailed Fountain formatting system prompt and overwrite the file with cleaned output.
-- **`converter.py`** — reads each cleaned `.fountain` file using screenplain's parser, auto-numbers any slugs that lack a scene number, then writes `output/<title>.pdf` with bold+underlined scene headings, page numbers, and margin scene numbers.
+**`src/steps/`** — pipeline stages (prefixed with step order):
+- **`_01_shortlister.py`** — fetches `/all-scripts.html`, scrapes all script title/link pairs, and records them in SQLite.
+- **`_02_downloader.py`** — downloads each script's HTML page from imsdb.com and writes raw text to `downloaded-scripts/<title>.fountain`.
+- **`_03a_parser_api.py`** / **`_03b_parser_claude_code.py`** — send each `.fountain` file to the Claude API (`claude-haiku-4-5`) with a detailed Fountain formatting system prompt and overwrite the file with cleaned output.
+- **`_04_converter.py`** — reads each cleaned `.fountain` file using screenplain's parser, auto-numbers any slugs that lack a scene number, then writes `output/<title>.pdf` with bold+underlined scene headings, page numbers, and margin scene numbers.
 
 **`src/helpers/`** — shared utilities:
 - **`db.py`** — SQLite state tracking for the pipeline.
+- **`imsdb.py`** — shared imsdb HTTP helpers (`BASE_URL`, `REQUEST_DELAY`, `get()`).
 - **`system_prompt.md`** — Fountain formatting system prompt used by the parser steps.
 
 **`src/main.py`** — entry point; runs crawl → parse → convert in sequence.

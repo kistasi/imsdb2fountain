@@ -6,9 +6,10 @@ Based on the original project by [j2kun](https://github.com/j2kun/imsdb_download
 
 ## Pipeline
 
-1. **Crawl** — scrapes all script pages from imsdb.com and saves raw text to `downloaded-scripts/`
-2. **Parse** — sends each file to `claude-haiku-4-5`, which cleans up scrape artifacts and normalises Fountain formatting while preserving the original text verbatim
-3. **Convert** — renders each cleaned `.fountain` file to PDF via screenplain, with bold+underlined scene headings, page numbers, and scene numbers in the margins
+1. **Shortlist** — scrapes all script title/link pairs from imsdb.com
+2. **Download** — fetches each script page and saves raw text to `downloaded-scripts/`
+3. **Parse** — sends each file to `claude-haiku-4-5`, which cleans up scrape artifacts and normalises Fountain formatting while preserving the original text verbatim
+4. **Convert** — renders each cleaned `.fountain` file to PDF via screenplain, with bold+underlined scene headings, page numbers, and scene numbers in the margins
 
 Output PDFs are written to `output/`.
 
