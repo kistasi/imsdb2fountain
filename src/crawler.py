@@ -7,6 +7,7 @@ from bs4 import BeautifulSoup
 
 BASE_URL = "http://www.imsdb.com"
 SCRIPTS_DIR = "downloaded-scripts"
+DOWNLOAD_LIMIT = 5  # HACK: remove to download all scripts
 REQUEST_DELAY = 1.0  # seconds between requests
 
 
@@ -53,6 +54,7 @@ def get_all_scripts():
     soup = BeautifulSoup(_get(BASE_URL + "/all-scripts.html"), "html.parser")
     time.sleep(REQUEST_DELAY)
 
+    downloaded = 0
     for p in soup.find_all("p"):
         if not p.a:
             continue
@@ -63,3 +65,7 @@ def get_all_scripts():
         path = os.path.join(SCRIPTS_DIR, title.strip() + ".fountain")
         with open(path, "w", encoding="utf-8") as f:
             f.write(script)
+
+        downloaded += 1
+        if downloaded >= DOWNLOAD_LIMIT:
+            break

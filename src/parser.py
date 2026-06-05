@@ -1,24 +1,36 @@
 import os
+import re
 
-from screenplay_tools.fountain.parser import ElementType, Parser
+from screenplay_tools.fountain.parser import Parser
 from screenplay_tools.fountain.writer import Writer
 
 
 SCRIPTS_DIR = "downloaded-scripts"
+
+_EXTERIOR = re.compile(r'^EXTERIOR\b')
+_INTERIOR = re.compile(r'^INTERIOR\b')
+
+
+def _preprocess_line(line):
+    stripped = line.lstrip('\t')
+    tab_count = len(line) - len(stripped)
+    if tab_count >= 3:
+        stripped = _EXTERIOR.sub('EXT.', stripped)
+        stripped = _INTERIOR.sub('INT.', stripped)
+    return stripped
 
 
 def parse_file(path):
     with open(path, encoding="utf-8") as f:
         content = f.read()
 
+    content = "\n".join(_preprocess_line(line) for line in content.splitlines())
+
     fp = Parser()
     fp.add_text(content)
 
-    for element in fp.script.elements:
-        if element.type is ElementType.ACTION:
-            element._text = " ".join(element.text.split())
-
     writer = Writer()
+    writer.pretty_print = False
     output = writer.write(fp.script)
 
     with open(path, "w", encoding="utf-8") as f:
