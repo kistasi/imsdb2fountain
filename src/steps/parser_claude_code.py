@@ -4,7 +4,9 @@ from pathlib import Path
 
 SCRIPTS_DIR = "downloaded-scripts"
 
-SYSTEM_PROMPT = (Path(__file__).parent.parent / "helpers" / "system_prompt.md").read_text(encoding="utf-8")
+SYSTEM_PROMPT = (
+    Path(__file__).parent.parent / "helpers" / "system_prompt.md"
+).read_text(encoding="utf-8")
 
 
 def parse_file(path):

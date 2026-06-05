@@ -14,7 +14,9 @@ def _fetch_script_text(relative_link):
     tail = relative_link.split("/")[-1]
     print(f"  fetching {tail}")
 
-    front_soup = BeautifulSoup(imsdb.get(imsdb.BASE_URL + quote(relative_link)), "html.parser")
+    front_soup = BeautifulSoup(
+        imsdb.get(imsdb.BASE_URL + quote(relative_link)), "html.parser"
+    )
     time.sleep(imsdb.REQUEST_DELAY)
 
     centers = front_soup.find_all("p", align="center")
