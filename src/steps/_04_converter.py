@@ -8,7 +8,7 @@ from screenplain.parsers import fountain
 from screenplain.richstring import parse_emphasis
 from screenplain.types import Slug
 
-from helpers import db
+from helpers import db, log
 
 SCRIPTS_DIR = "downloaded-scripts"
 OUTPUT_DIR = "output"
@@ -45,10 +45,10 @@ def step_04_convert():
         if title not in pending:
             continue
 
-        print(f"converting {filename}")
+        log.info(f"converting {filename}")
         try:
             convert_file(os.path.join(SCRIPTS_DIR, filename), out_dir)
             db.set_status(title, "converted")
         except Exception as e:
-            print(f"  error: {e}")
+            log.error(f"convert failed for {filename}: {e}")
             db.set_status(title, "failed", str(e))

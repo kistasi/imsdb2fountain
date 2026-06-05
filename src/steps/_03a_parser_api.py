@@ -3,7 +3,7 @@ from pathlib import Path
 
 import anthropic
 
-from helpers import db
+from helpers import db, log
 
 SCRIPTS_DIR = "downloaded-scripts"
 
@@ -53,10 +53,10 @@ def step_03a_parse_api():
         if title not in pending:
             continue
 
-        print(f"parsing {filename}")
+        log.info(f"parsing {filename}")
         try:
             parse_file(os.path.join(SCRIPTS_DIR, filename))
             db.set_status(title, "parsed")
         except Exception as e:
-            print(f"  error: {e}")
+            log.error(f"parse failed for {filename}: {e}")
             db.set_status(title, "failed", str(e))

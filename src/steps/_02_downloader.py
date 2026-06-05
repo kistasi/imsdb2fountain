@@ -4,14 +4,14 @@ from urllib.parse import quote
 
 from bs4 import BeautifulSoup
 
-from helpers import db, imsdb
+from helpers import db, imsdb, log
 
 SCRIPTS_DIR = "downloaded-scripts"
 
 
 def _fetch_script_text(relative_link):
     tail = relative_link.split("/")[-1]
-    print(f"  fetching {tail}")
+    log.debug(f"fetching {tail}")
 
     front_soup = BeautifulSoup(
         imsdb.get(imsdb.BASE_URL + quote(relative_link)), "html.parser"
@@ -20,12 +20,12 @@ def _fetch_script_text(relative_link):
 
     centers = front_soup.find_all("p", align="center")
     if not centers or not centers[0].a:
-        print(f"  {tail}: no script link")
+        log.warning(f"{tail}: no script link")
         return None
 
     script_link = centers[0].a["href"]
     if not script_link.endswith(".html"):
-        print(f"  {tail}: PDF only, skipping")
+        log.warning(f"{tail}: PDF only, skipping")
         return None
 
     script_soup = BeautifulSoup(imsdb.get(imsdb.BASE_URL + script_link), "html.parser")
@@ -33,7 +33,7 @@ def _fetch_script_text(relative_link):
 
     cells = script_soup.find_all("td", {"class": "scrtext"})
     if not cells:
-        print(f"  {tail}: no script text")
+        log.warning(f"{tail}: no script text")
         return None
 
     return cells[0].get_text()
@@ -44,18 +44,18 @@ def step_02_download_all():
 
     pending = db.get_by_status("shortlisted") + db.get_by_status("failed")
     if not pending:
-        print("nothing to download")
+        log.info("nothing to download")
         return
 
     for row in pending:
         title = row["title"]
         link = row["imsdb_link"]
-        print(f"downloading {title!r}")
+        log.info(f"downloading {title!r}")
 
         try:
             script = _fetch_script_text(link)
         except Exception as e:
-            print(f"  error: {e}")
+            log.error(f"download failed for {title!r}: {e}")
             db.set_status_by_link(link, "failed", str(e))
             continue
 

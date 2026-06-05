@@ -2,6 +2,8 @@ import os
 import subprocess
 from pathlib import Path
 
+from helpers import log
+
 SCRIPTS_DIR = "downloaded-scripts"
 
 SYSTEM_PROMPT = (
@@ -36,5 +38,5 @@ def parse_file(path):
 def step_03b_parse_claude_code():
     for filename in os.listdir(SCRIPTS_DIR):
         if filename.endswith(".fountain"):
-            print(f"parsing {filename}")
+            log.info(f"parsing {filename}")
             parse_file(os.path.join(SCRIPTS_DIR, filename))

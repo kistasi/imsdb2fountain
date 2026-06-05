@@ -2,7 +2,7 @@ import time
 
 from bs4 import BeautifulSoup
 
-from helpers import db, imsdb
+from helpers import db, imsdb, log
 
 
 def step_01_shortlist_all():
@@ -18,4 +18,4 @@ def step_01_shortlist_all():
         db.upsert_shortlisted(title, link)
         count += 1
 
-    print(f"shortlisted {count} screenplays")
+    log.info(f"shortlisted {count} screenplays")
