@@ -42,7 +42,7 @@ def parse_file(path):
         f.write(text)
 
 
-def parse_api():
+def step_03a_parse_api():
     pending = {row["title"] for row in db.get_by_status("downloaded")}
     pending |= {row["title"] for row in db.get_by_status("failed")}
 

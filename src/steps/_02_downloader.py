@@ -40,7 +40,7 @@ def _fetch_script_text(relative_link):
     return cells[0].get_text()
 
 
-def download_all():
+def step_02_download_all():
     os.makedirs(SCRIPTS_DIR, exist_ok=True)
 
     pending = db.get_by_status("shortlisted") + db.get_by_status("failed")

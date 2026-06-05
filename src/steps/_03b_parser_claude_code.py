@@ -33,7 +33,7 @@ def parse_file(path):
         f.write(result.stdout)
 
 
-def parse_claude_code():
+def step_03b_parse_claude_code():
     for filename in os.listdir(SCRIPTS_DIR):
         if filename.endswith(".fountain"):
             print(f"parsing {filename}")

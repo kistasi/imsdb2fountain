@@ -5,7 +5,7 @@ from bs4 import BeautifulSoup
 from helpers import db, imsdb
 
 
-def shortlist_all():
+def step_01_shortlist_all():
     soup = BeautifulSoup(imsdb.get(imsdb.BASE_URL + "/all-scripts.html"), "html.parser")
     time.sleep(imsdb.REQUEST_DELAY)
 

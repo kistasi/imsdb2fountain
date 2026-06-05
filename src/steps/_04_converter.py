@@ -31,7 +31,7 @@ def convert_file(src_path, out_dir):
         pdf.to_pdf(screenplay, f, settings=settings)
 
 
-def convert():
+def step_04_convert():
     out_dir = Path(OUTPUT_DIR)
     out_dir.mkdir(exist_ok=True)
 
