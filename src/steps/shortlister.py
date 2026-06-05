@@ -1,23 +1,13 @@
 import time
 
-import requests
 from bs4 import BeautifulSoup
 
-from helpers import db
-
-BASE_URL = "http://www.imsdb.com"
-REQUEST_DELAY = 1.0
-
-
-def _get(url):
-    response = requests.get(url, timeout=30)
-    response.raise_for_status()
-    return response.text
+from helpers import db, imsdb
 
 
 def shortlist_all():
-    soup = BeautifulSoup(_get(BASE_URL + "/all-scripts.html"), "html.parser")
-    time.sleep(REQUEST_DELAY)
+    soup = BeautifulSoup(imsdb.get(imsdb.BASE_URL + "/all-scripts.html"), "html.parser")
+    time.sleep(imsdb.REQUEST_DELAY)
 
     count = 0
     for p in soup.find_all("p"):

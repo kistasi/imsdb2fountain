@@ -2,30 +2,20 @@ import os
 import time
 from urllib.parse import quote
 
-import requests
 from bs4 import BeautifulSoup
 
-from helpers import db
+from helpers import db, imsdb
 
-BASE_URL = "http://www.imsdb.com"
 SCRIPTS_DIR = "downloaded-scripts"
 DOWNLOAD_LIMIT = 1  # HACK: remove to download all scripts
-REQUEST_DELAY = 1.0  # seconds between requests
-
-
-def _get(url):
-    response = requests.get(url, timeout=30)
-    response.raise_for_status()
-    return response.text
 
 
 def _fetch_script_text(relative_link):
-    """Return script text, or None if unavailable (no script, PDF-only, etc.)."""
     tail = relative_link.split("/")[-1]
     print(f"  fetching {tail}")
 
-    front_soup = BeautifulSoup(_get(BASE_URL + quote(relative_link)), "html.parser")
-    time.sleep(REQUEST_DELAY)
+    front_soup = BeautifulSoup(imsdb.get(imsdb.BASE_URL + quote(relative_link)), "html.parser")
+    time.sleep(imsdb.REQUEST_DELAY)
 
     centers = front_soup.find_all("p", align="center")
     if not centers or not centers[0].a:
@@ -37,8 +27,8 @@ def _fetch_script_text(relative_link):
         print(f"  {tail}: PDF only, skipping")
         return None
 
-    script_soup = BeautifulSoup(_get(BASE_URL + script_link), "html.parser")
-    time.sleep(REQUEST_DELAY)
+    script_soup = BeautifulSoup(imsdb.get(imsdb.BASE_URL + script_link), "html.parser")
+    time.sleep(imsdb.REQUEST_DELAY)
 
     cells = script_soup.find_all("td", {"class": "scrtext"})
     if not cells:
@@ -49,7 +39,6 @@ def _fetch_script_text(relative_link):
 
 
 def download_all():
-    """Download raw script text for every shortlisted (or previously failed) screenplay."""
     os.makedirs(SCRIPTS_DIR, exist_ok=True)
 
     pending = db.get_by_status("shortlisted") + db.get_by_status("failed")
