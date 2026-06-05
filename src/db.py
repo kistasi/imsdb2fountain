@@ -34,29 +34,38 @@ def _conn():
 
 def upsert_shortlisted(title: str, imsdb_link: str):
     with _conn() as conn:
-        conn.execute("""
+        conn.execute(
+            """
             INSERT INTO scripts (title, imsdb_link, status, updated_at)
             VALUES (?, ?, 'shortlisted', datetime('now'))
             ON CONFLICT(title) DO NOTHING
-        """, (title, imsdb_link))
+        """,
+            (title, imsdb_link),
+        )
 
 
 def set_status(title: str, status: str, error: str | None = None):
     with _conn() as conn:
-        conn.execute("""
+        conn.execute(
+            """
             UPDATE scripts
             SET status = ?, error = ?, updated_at = datetime('now')
             WHERE title = ?
-        """, (status, error, title))
+        """,
+            (status, error, title),
+        )
 
 
 def set_status_by_link(imsdb_link: str, status: str, error: str | None = None):
     with _conn() as conn:
-        conn.execute("""
+        conn.execute(
+            """
             UPDATE scripts
             SET status = ?, error = ?, updated_at = datetime('now')
             WHERE imsdb_link = ?
-        """, (status, error, imsdb_link))
+        """,
+            (status, error, imsdb_link),
+        )
 
 
 def get_at_or_before(status: str) -> list[sqlite3.Row]:
